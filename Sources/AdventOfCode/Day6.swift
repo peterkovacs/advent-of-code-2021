@@ -36,7 +36,7 @@ struct Day6: ParsableCommand {
     }
 }
 
-extension Dictionary where Key == Int, Value == Int {
+fileprivate extension Dictionary where Key == Int, Value == Int {
     init(lanternFish input: [Int]) {
         self = input.reduce(into: [:]) {
             $0[$1, default: 0] += 1
