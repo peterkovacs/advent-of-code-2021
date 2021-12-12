@@ -201,6 +201,10 @@ public struct Grid<T>: Sequence {
         c.neighbors(limitedBy: maxX, and: maxY)
     }
 
+    public func neighbors8(_ c: Coordinate) -> [Coordinate] {
+        c.neighbors8(maxX: maxX, maxY: maxY)
+    }
+    
     func transform(x: Int, y: Int) -> (x: Int, y: Int) {
         let point = CGPoint(x: x, y: y).applying(transform)
         return (x: Int(point.x.rounded()), y: Int(point.y.rounded()))
@@ -268,6 +272,10 @@ public struct Grid<T>: Sequence {
                 self[x: x, y: y] = grid[x: x - origin.x, y: y - origin.y]
             }
         }
+    }
+    
+    func map<U>(_ transform: (Element) throws -> U) rethrows -> Grid<U> {
+        return try Grid<U>(grid.map(transform), maxX: maxX, maxY: maxY)!
     }
 }
 
