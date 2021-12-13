@@ -213,7 +213,7 @@ public struct Grid<T>: Sequence {
 
     public subscript( x x: CountableRange<Int>, y y: CountableRange<Int>) -> Grid<Element>? {
         return Grid(
-            product(x, y).map { (x, y) in self[x: x, y: y] },
+            product(y, x).map { (y, x) in self[x: x, y: y] },
             maxX: x.count,
             maxY: y.count,
             transform: .identity
@@ -257,6 +257,15 @@ public struct Grid<T>: Sequence {
                 .translatedBy(x: -CGFloat(maxX) + 1, y: 0)
         )
     }
+    
+    public var flipped: Self {
+        applying(
+            CGAffineTransform.identity
+                .scaledBy(x: 1, y: -1)
+                .translatedBy(x: 0, y: -CGFloat(maxY) + 1)
+        )
+    }
+
 
     public func makeIterator() -> Iterator {
         return Iterator(grid: self, iterator: CoordinateIterator(maxX: maxX, maxY: maxY, transform: transform, coordinate: Coordinate(x: 0, y: 0)))
