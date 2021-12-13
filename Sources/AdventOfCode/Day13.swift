@@ -51,15 +51,18 @@ fileprivate extension Grid where Element == Character {
         if coordinate.x > 0 {
             folded = self[x: (coordinate.x + 1) ..< maxX, y: 0..<maxY]!.mirrored
             result = self[x: 0..<(coordinate.x), y: 0..<maxY]!
+            result = result.applying(.identity.translatedBy(x: CGFloat(result.maxX - folded.maxX), y: 0))
         } else {
             folded = self[x: 0..<maxX, y: (coordinate.y + 1) ..< maxY]!.flipped
             result = self[x: 0..<maxX, y: 0..<coordinate.y]!
+            result = result.applying(.identity.translatedBy(x: 0, y: CGFloat(result.maxY - folded.maxY)))
         }
-
+        
         for i in folded.indices {
             result[i] = result[i] == "█" || folded[i] == "█" ? "█" : " "
         }
             
-        return Grid(result, maxX: result.maxX, maxY: result.maxY)!
+        print("fold", result.maxX, result.maxY, coordinate, maxX, maxY)
+        return Grid(result.grid, maxX: result.maxX, maxY: result.maxY)!
     }
 }
