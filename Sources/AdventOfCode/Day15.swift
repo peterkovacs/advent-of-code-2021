@@ -6,31 +6,29 @@ import Collections
 
 struct Day15: ParsableCommand {
     static let input = Array(stdin)
-    func part1() {
-        let grid = Grid(
-            Self.input.joined().map { Int(String($0))! },
-            maxX: Self.input[0].count,
-            maxY: Self.input.count
-        )!
-        
-        var q = Set<Coordinate>()
+    
+    func dijkstra(grid: Grid<Int>) -> Int {
+        var q = Set<Coordinate>(grid.indices)
         var prev = [Coordinate: Coordinate]()
         var dist = [Coordinate: Int]()
+        var heap = Heap<Node>([.init(coordinate: .zero, cost: 0)])
         dist[.zero] = 0
         
         while true {
-            guard let u = dist.filter( { !q.contains($0.key) }).min(by: { $0.value < $1.value })?.key else { break }
-            q.insert(u)
+            guard let u = heap.popMin() else { break }
+            guard dist[u.coordinate] == u.cost else { continue }
+            q.remove(u.coordinate)
             
-            for v in grid.neighbors(u) where !q.contains(v) {
-                let alt = dist[u].map { grid[v] + $0 } ?? Int.max
+            for v in grid.neighbors(u.coordinate) where q.contains(v) {
+                let alt = dist[u.coordinate].map { grid[v] + $0 } ?? Int.max
                 if alt < dist[v] ?? Int.max {
+                    heap.insert(.init(coordinate: v, cost: alt))
                     dist[v] = alt
-                    prev[v] = u
+                    prev[v] = u.coordinate
                 }
             }
         }
-        
+
         var result = [Coordinate]()
         var u = Coordinate(x: grid.maxX - 1, y: grid.maxY - 1) as Coordinate?
         while u != nil {
@@ -38,10 +36,28 @@ struct Day15: ParsableCommand {
             u = prev[u!]
         }
         
-        let part1 = result.map { grid[$0] }.reduce(0, +) - grid[.zero]
-        print("Part 1", part1)
+        return result.map { grid[$0] }.reduce(0, +) - grid[.zero]
     }
     
+    func part1() {
+        let grid = Grid(
+            Self.input.joined().map { Int(String($0))! },
+            maxX: Self.input[0].count,
+            maxY: Self.input.count
+        )!
+        
+        print("Part 1", dijkstra(grid: grid))
+    }
+    
+    struct Node: Comparable {
+        
+        let coordinate: Coordinate
+        let cost: Int
+        static func <(lhs: Node, rhs: Node) -> Bool {
+            lhs.cost < rhs.cost
+        }
+    }
+
     func part2() {
         let baseGrid = Self.input.joined().map { Int(String($0))! }
         let maxX = Self.input[0].count
@@ -58,33 +74,7 @@ struct Day15: ParsableCommand {
             maxY: maxY * 5
         )!
         
-        var q = Set<Coordinate>()
-        var prev = [Coordinate: Coordinate]()
-        var dist = [Coordinate: Int]()
-        dist[.zero] = 0
-        
-        while true {
-            guard let u = dist.filter( { !q.contains($0.key) }).min(by: { $0.value < $1.value })?.key else { break }
-            q.insert(u)
-            
-            for v in grid.neighbors(u) where !q.contains(v) {
-                let alt = dist[u].map { grid[v] + $0 } ?? Int.max
-                if alt < dist[v] ?? Int.max {
-                    dist[v] = alt
-                    prev[v] = u
-                }
-            }
-        }
-        
-        var result = [Coordinate]()
-        var u = Coordinate(x: grid.maxX - 1, y: grid.maxY - 1) as Coordinate?
-        while u != nil {
-            result.append(u!)
-            u = prev[u!]
-        }
-        
-        let part1 = result.map { grid[$0] }.reduce(0, +) - grid[.zero]
-        print("Part 2", part1)
+        print("Part 2", dijkstra(grid: grid))
 
     }
     
