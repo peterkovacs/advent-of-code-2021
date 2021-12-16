@@ -128,7 +128,13 @@ extension Packet {
         }
             .joined()
         
-        guard let value = Packet.parser.parse(str) else { return nil }
+        let value = Packet.parser
+            // The outermost packet can be padded with 0s. This will discard them and
+            // ensure we parse the entire input.
+            .skip(Prefix(while: { $0 == "0" }))
+            .skip(End())
+            .parse(str)
+        guard let value = value  else { return nil }
         self = value
     }
 }
