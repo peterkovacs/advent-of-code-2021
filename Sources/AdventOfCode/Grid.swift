@@ -19,6 +19,7 @@ public struct Coordinate {
     public var north: Coordinate { return Coordinate( x: x, y: y + 1 ) }
 
     public var neighbors: [Coordinate] { return [ up, left, right, down ] }
+    public var neighbors8: [Coordinate] { return [ up, left, right, down, left.up, right.up, left.down, right.down ] }
 
     public func neighbors(limitedBy: Int) -> [Coordinate] {
         return neighbors(limitedBy: limitedBy, and: limitedBy )
@@ -28,8 +29,8 @@ public struct Coordinate {
         return [ left, right, up, down ].filter { $0.isValid( x: xLimit, y: yLimit ) }
     }
 
-    public func isValid( x: Int, y: Int ) -> Bool {
-        return self.x >= 0 && self.x < x && self.y >= 0 && self.y < y
+    public func isValid( minX: Int = 0, x: Int, minY: Int = 0, y: Int ) -> Bool {
+        return self.x >= minX && self.x < x && self.y >= minY && self.y < y
     }
 
     public func go(in direction: Direction, while condition: (Self) -> Bool) -> Coordinate {
@@ -55,9 +56,9 @@ public struct Coordinate {
     }
 
     public func neighbors8( maxX: Int, maxY: Int ) -> [Coordinate] {
-        return [ left, right, up, down, left.up, right.up, left.down, right.down ].filter { $0.isValid(x: maxX, y: maxY) }
+        return neighbors8.filter { $0.isValid(x: maxX, y: maxY) }
     }
-
+    
     public func direction(to: Coordinate) -> Direction {
         if abs(self.x - to.x) > abs(self.y - to.y) {
             return self.x > to.x ? \Coordinate.left : \Coordinate.right
