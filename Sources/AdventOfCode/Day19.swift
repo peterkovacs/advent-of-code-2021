@@ -4,17 +4,7 @@ import ArgumentParser
 import Algorithms
 import Parsing
 
-struct Coordinate3D: Equatable, Hashable {
-    let x, y, z: Int
-       
-    static func +(lhs: Coordinate3D, rhs: Coordinate3D) -> Coordinate3D {
-        .init(x: lhs.x + rhs.x, y: lhs.y + rhs.y, z: lhs.z + rhs.z)
-    }
-    
-    static func -(lhs: Coordinate3D, rhs: Coordinate3D) -> Coordinate3D {
-        .init(x: lhs.x - rhs.x, y: lhs.y - rhs.y, z: lhs.z - rhs.z)
-    }
-    
+extension Coordinate3D {
     typealias Transform = (Coordinate3D) -> Coordinate3D
 
     static let flips: [Transform] = [
@@ -94,11 +84,6 @@ struct Day19: ParsableCommand {
     }
 }
 
-extension Coordinate3D: CustomStringConvertible {
-    var description: String {
-        "\(x),\(y),\(z)"
-    }
-}
 
 struct Scanner {
     var beacons: Set<Coordinate3D>
